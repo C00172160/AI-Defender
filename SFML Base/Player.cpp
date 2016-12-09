@@ -18,7 +18,10 @@ Player::Player(sf::Texture& tex, sf::Vector2f pos, sf::Vector2f maxVel)
 	mScale = sf::Vector2f(1.f, 1.f);
 
 	flipSpeed = 0.15f;
-	
+	playerFacingRight = true;
+	canShoot = true;
+	shotTimer = 0;
+	shotdelay = 0.3;
 	
 }
 
@@ -74,11 +77,12 @@ void Player::MoveLeft(bool pressed)
 	{
 		if (velocity.x < 0)
 		{
-			velocity.x += 0.5;
+			velocity.x += 1.5;
 		}
 	}
 }
 void Player::MoveRight(bool pressed)
+
 {
 	if (pressed == true)
 	{
@@ -93,28 +97,57 @@ void Player::MoveRight(bool pressed)
 	{
 		if (velocity.x > 0)
 		{
-			velocity.x -= 0.5;
+			velocity.x -= 1.5;
 		}
 	}
 }
-
+void Player::Shoot(sf::Texture& tex)
+{	
+	if (canShoot == true)
+	{
+		bulletList.push_back(new Bullet(mPositon, tex, playerFacingRight, velocity));
+		shotTimer = 0;
+	}
+	
+}
 void Player::Update()
 {
+	shotTimer += shotClock.getElapsedTime().asSeconds();
+	sf::Time dt = shotClock.restart();
 
-	
+	if (shotTimer > shotdelay)
+	{
+		canShoot = true;
+	}
+	else
+	{
+		canShoot = false;
+	}
+
 	Flip();
 
+	mSprite.setScale(mScale);
+	mPositon += velocity;
+	mSprite.setPosition(mPositon);
 
-		mSprite.setScale(mScale);
-		mPositon += velocity;
-		mSprite.setPosition(mPositon);
 	
-
+	for (int i =0; i< bulletList.size();i++)
+	{
+		if (bulletList[i]->Update() == false)
+		{
+			bulletList.erase(bulletList.begin() + i);
+		}		
+	}
 }
-
 void Player::Draw(sf::RenderWindow &window)
 {
 	window.draw(mSprite);
+
+	for (int i = 0; i < bulletList.size(); i++)
+	{
+		bulletList[i]->Draw(window);
+	}
+	
 }
 
 void Player::Flip()
@@ -130,6 +163,8 @@ void Player::Flip()
 		if (mScale.x < 1)
 			mScale.x += flipSpeed;
 	}
+
+
 
 	/*if (playerFacingUp == true)
 	{

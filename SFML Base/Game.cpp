@@ -15,14 +15,11 @@ void Game::init()
 	playershipTexture.loadFromFile("assets/player/PlayerShip.png");
 	playershipTexture.setSmooth(true);
 	backgroundTexture.loadFromFile("assets/background/background.png");
-
+	bulletTexture.loadFromFile("assets/player/bullet.png");
 	font.loadFromFile("content\\fonts\\kenvector_future.TTF");
 
 	player1 = new Player(playershipTexture, sf::Vector2f(200, 200), sf::Vector2f(20, 20));//set up player
-	/*text.setFont(font);
-	text.setString("Main Game");
-	text.setPosition(screenSize.x / 2, screenSize.y / 2);
-	text.setCharacterSize(18);*/
+	
 }
 
 void Game::update()
@@ -84,5 +81,10 @@ void Game::controller(sf::Event Event)
 	else if (inputManager->KeyReleased(sf::Keyboard::S))
 	{
 		player1->MoveDown(false);
+	}
+
+	if (inputManager->KeyPressed(sf::Keyboard::Space))
+	{
+		player1->Shoot(bulletTexture);
 	}
 }
